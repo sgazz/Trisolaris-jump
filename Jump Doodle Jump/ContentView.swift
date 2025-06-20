@@ -9,6 +9,63 @@ import SwiftUI
 import CoreMotion
 import AVFoundation
 
+// --- TEME ---
+enum ThemeType: String, CaseIterable {
+    case color = "Color"
+    case monochrome = "Monochrome"
+}
+
+struct Theme {
+    let accent: Color
+    let backgroundGradient: [Color]
+    let trisolaris: [Color]
+    let platformNormal: [Color]
+    let platformBreakable: Color
+    let platformMoving: Color
+    let enemy: Color
+    let projectile: Color
+    let collectible: Color
+    let shield: Color
+    let particleJetpack: Color
+    let particleExplosion: Color
+    let textColor: Color
+    let buttonTextColor: Color
+
+    static let colorful = Theme(
+        accent: .cyan,
+        backgroundGradient: [.black, Color.purple.opacity(0.3), Color.blue.opacity(0.2)],
+        trisolaris: [Color(white: 0.8), .red, .green],
+        platformNormal: [.green, .blue, .purple, .orange],
+        platformBreakable: Color(.sRGB, red: 0.6, green: 0.4, blue: 0.2, opacity: 1.0), // Brown
+        platformMoving: .gray,
+        enemy: .red,
+        projectile: .yellow,
+        collectible: .yellow,
+        shield: .blue,
+        particleJetpack: .orange,
+        particleExplosion: .red,
+        textColor: .white,
+        buttonTextColor: .white
+    )
+
+    static let monochrome = Theme(
+        accent: .white,
+        backgroundGradient: [.black, Color(white: 0.15), Color(white: 0.3)],
+        trisolaris: [Color(white: 0.9), Color(white: 0.7), Color(white: 0.5)],
+        platformNormal: [Color(white: 0.6)],
+        platformBreakable: Color(white: 0.4),
+        platformMoving: Color(white: 0.8),
+        enemy: .white,
+        projectile: .white,
+        collectible: Color(white: 0.95),
+        shield: .white,
+        particleJetpack: Color(white: 0.8),
+        particleExplosion: .white,
+        textColor: .white,
+        buttonTextColor: .black
+    )
+}
+
 // Enum za tipove Power-up-ova
 enum PowerUpType: String {
     case jetpack
@@ -84,6 +141,10 @@ struct ContentView: View {
     @State private var projectiles: [Projectile] = []
     @State private var collectibles: [Collectible] = []
     
+    // Stanja za Teme
+    @State private var activeTheme: Theme = Theme.colorful
+    @State private var selectedThemeType: ThemeType = .color
+    
     let gravity: CGFloat = 0.8
     let jumpForce: CGFloat = -20
     let moveSpeed: CGFloat = 8
@@ -102,17 +163,8 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Svemirska pozadina
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.black,
-                    Color.purple.opacity(0.3),
-                    Color.blue.opacity(0.2)
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            LinearGradient(gradient: Gradient(colors: activeTheme.backgroundGradient), startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
             
             // Zvezde u pozadini
             ForEach(0..<50, id: \.self) { _ in
@@ -168,9 +220,9 @@ struct ContentView: View {
                             switch powerUp {
                             case .jetpack:
                                 Image(systemName: "flame.fill")
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(activeTheme.particleJetpack)
                                     .font(.title2)
-                                    .shadow(color: .orange, radius: 10)
+                                    .shadow(color: activeTheme.particleJetpack, radius: 10)
                             case .spring:
                                 Image(systemName: "arrow.up.circle.fill")
                                     .foregroundColor(.green)
@@ -178,9 +230,9 @@ struct ContentView: View {
                                     .shadow(color: .green, radius: 10)
                             case .shield:
                                 Image(systemName: "shield.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(activeTheme.shield)
                                     .font(.title2)
-                                    .shadow(color: .blue, radius: 10)
+                                    .shadow(color: activeTheme.shield, radius: 10)
                             }
                         }
                         
@@ -188,9 +240,9 @@ struct ContentView: View {
                         if platform.enemy != nil {
                             Image(systemName: "ladybug.fill")
                                 .font(.system(size: 30))
-                                .foregroundColor(.red)
+                                .foregroundColor(activeTheme.enemy)
                                 .offset(y: -25) // Postavi ga iznad platforme
-                                .shadow(color: .red, radius: 5)
+                                .shadow(color: activeTheme.enemy, radius: 5)
                         }
                     }
                     .position(platform.position)
@@ -202,20 +254,20 @@ struct ContentView: View {
                 // Aura štita
                 if isShieldActive {
                     Circle()
-                        .stroke(Color.blue.opacity(0.8), lineWidth: 4)
+                        .stroke(activeTheme.shield.opacity(0.8), lineWidth: 4)
                         .frame(width: 80, height: 80)
                         .scaleEffect(isShieldActive ? 1.0 : 0.9)
                         .opacity(isShieldActive ? 1.0 : 0.0)
                         .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: isShieldActive)
-                        .shadow(color: .blue, radius: 10)
+                        .shadow(color: activeTheme.shield, radius: 10)
                 }
                 
                 // Sivi krug
                 ZStack {
                     Circle()
-                        .fill(Color(white: 0.8))
+                        .fill(activeTheme.trisolaris[0])
                         .frame(width: 30, height: 30)
-                        .shadow(color: .white, radius: 8)
+                        .shadow(color: activeTheme.trisolaris[0], radius: 8)
                     Text("+")
                         .foregroundColor(.black.opacity(0.7))
                         .font(.system(size: 20, weight: .bold))
@@ -225,9 +277,9 @@ struct ContentView: View {
                 // Crveni krug
                 ZStack {
                     Circle()
-                        .fill(Color.red)
+                        .fill(activeTheme.trisolaris[1])
                         .frame(width: 30, height: 30)
-                        .shadow(color: .red, radius: 8)
+                        .shadow(color: activeTheme.trisolaris[1], radius: 8)
                     Text("+")
                         .foregroundColor(.white.opacity(0.8))
                         .font(.system(size: 20, weight: .bold))
@@ -237,9 +289,9 @@ struct ContentView: View {
                 // Zeleni krug
                 ZStack {
                     Circle()
-                        .fill(Color.green)
+                        .fill(activeTheme.trisolaris[2])
                         .frame(width: 30, height: 30)
-                        .shadow(color: .green, radius: 8)
+                        .shadow(color: activeTheme.trisolaris[2], radius: 8)
                     Text("+")
                         .foregroundColor(.white.opacity(0.8))
                         .font(.system(size: 20, weight: .bold))
@@ -255,16 +307,16 @@ struct ContentView: View {
                     HStack {
                         Text("Score: \(score)")
                             .font(.system(size: 36, weight: .bold, design: .monospaced))
-                            .foregroundColor(.white)
-                            .shadow(color: .white, radius: 5)
+                            .foregroundColor(activeTheme.textColor)
+                            .shadow(color: activeTheme.textColor, radius: 5)
                         
                         Spacer()
                         
                         Button(action: pauseGame) {
                             Image(systemName: "pause.circle.fill")
                                 .font(.system(size: 36))
-                                .foregroundColor(.white.opacity(0.8))
-                                .shadow(color: .white, radius: 5)
+                                .foregroundColor(activeTheme.textColor.opacity(0.8))
+                                .shadow(color: activeTheme.textColor, radius: 5)
                         }
                     }
                     .padding()
@@ -276,22 +328,21 @@ struct ContentView: View {
             if !isGameActive && !isGameOverScreenShowing {
                 VStack(spacing: 20) {
                     Text("TRISOLARIS JUMP")
-                        .font(.largeTitle).fontWeight(.bold).foregroundColor(.white).shadow(color: .cyan, radius: 10)
+                        .font(.largeTitle).fontWeight(.bold).foregroundColor(activeTheme.textColor).shadow(color: activeTheme.accent, radius: 10)
                     
                     Text("High Score: \(highScore)")
-                        .font(.title2).foregroundColor(.white.opacity(0.8))
+                        .font(.title2).foregroundColor(activeTheme.textColor.opacity(0.8))
                     
-                    Text("Naginjajte telefon levo/desno").foregroundColor(.white).font(.title3).padding().shadow(color: .white, radius: 3)
+                    Text("Naginjajte telefon levo/desno").foregroundColor(activeTheme.textColor).font(.title3).padding().shadow(color: activeTheme.textColor, radius: 3)
                     
                     Button("START", action: startGame)
-                        .font(.title2).foregroundColor(.white).padding().background(Color.cyan.opacity(0.3)).cornerRadius(10)
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.cyan, lineWidth: 2)).shadow(color: .cyan, radius: 10)
+                        .font(.title2).foregroundColor(activeTheme.buttonTextColor).padding().background(activeTheme.accent.opacity(0.4)).cornerRadius(10)
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(activeTheme.accent, lineWidth: 2)).shadow(color: activeTheme.accent, radius: 10)
                     
-                    Button(action: toggleSound) {
-                        Image(systemName: isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                            .font(.title).foregroundColor(.white)
-                    }
-                    .padding()
+                    HStack(spacing: 40) {
+                        Button(action: toggleSound) { Image(systemName: isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill").font(.title).foregroundColor(activeTheme.textColor) }
+                        Button(action: toggleTheme) { Image(systemName: "paintbrush.fill").font(.title).foregroundColor(activeTheme.textColor) }
+                    }.padding()
                 }
             }
             
@@ -299,13 +350,13 @@ struct ContentView: View {
             if isPaused {
                 Color.black.opacity(0.6).ignoresSafeArea()
                 VStack(spacing: 30) {
-                    Text("PAUSED").font(.largeTitle).fontWeight(.bold).foregroundColor(.white).shadow(color: .white, radius: 10)
+                    Text("PAUSED").font(.largeTitle).fontWeight(.bold).foregroundColor(activeTheme.textColor).shadow(color: activeTheme.textColor, radius: 10)
                     
                     Button("RESUME", action: resumeGame)
-                        .font(.title).foregroundColor(.white).padding(.horizontal, 40).padding(.vertical, 15).background(Color.green.opacity(0.8)).cornerRadius(15).shadow(color: .green, radius: 10)
+                        .font(.title).foregroundColor(activeTheme.textColor).padding(.horizontal, 40).padding(.vertical, 15).background(Color.green.opacity(0.8)).cornerRadius(15).shadow(color: .green, radius: 10)
                     
                     Button("QUIT", action: quitGame)
-                        .font(.title).foregroundColor(.white).padding(.horizontal, 40).padding(.vertical, 15).background(Color.red.opacity(0.8)).cornerRadius(15).shadow(color: .red, radius: 10)
+                        .font(.title).foregroundColor(activeTheme.textColor).padding(.horizontal, 40).padding(.vertical, 15).background(Color.red.opacity(0.8)).cornerRadius(15).shadow(color: .red, radius: 10)
                 }
             }
             
@@ -316,8 +367,8 @@ struct ContentView: View {
                 VStack(spacing: 20) {
                     Text("GAME OVER")
                         .font(.system(size: 48, weight: .bold))
-                        .foregroundColor(.red)
-                        .shadow(color: .red, radius: 10)
+                        .foregroundColor(activeTheme.enemy)
+                        .shadow(color: activeTheme.enemy, radius: 10)
                     
                     Text("Score: \(score)")
                         .font(.system(size: 32, design: .monospaced))
@@ -329,7 +380,7 @@ struct ContentView: View {
                         startGame()
                     }
                     .font(.title)
-                    .foregroundColor(.white)
+                    .foregroundColor(activeTheme.textColor)
                     .padding(.horizontal, 40)
                     .padding(.vertical, 15)
                     .background(Color.green.opacity(0.8))
@@ -337,7 +388,7 @@ struct ContentView: View {
                     .shadow(color: .green, radius: 10)
                     .padding(.top, 20)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(activeTheme.textColor)
             }
         }
         .onTapGesture {
@@ -586,9 +637,9 @@ struct ContentView: View {
         
         var color: Color
         switch platformType {
-        case .normal: color = [.green, .blue, .purple, .orange].randomElement() ?? .green
-        case .breakable: color = Color(.brown)
-        case .moving: color = .gray
+        case .normal: color = activeTheme.platformNormal.randomElement() ?? .gray
+        case .breakable: color = activeTheme.platformBreakable
+        case .moving: color = activeTheme.platformMoving
         }
         
         var newPlatform = Platform(
@@ -692,6 +743,10 @@ struct ContentView: View {
     private func loadPreferences() {
         highScore = UserDefaults.standard.integer(forKey: "TrisolarisJumpHighScore")
         isSoundEnabled = !UserDefaults.standard.bool(forKey: "TrisolarisJumpMuted")
+        
+        let themeRaw = UserDefaults.standard.string(forKey: "TrisolarisTheme") ?? ThemeType.color.rawValue
+        selectedThemeType = ThemeType(rawValue: themeRaw) ?? .color
+        activeTheme = selectedThemeType == .color ? Theme.colorful : Theme.monochrome
     }
     
     private func saveSoundPreference() {
@@ -883,6 +938,21 @@ struct ContentView: View {
         isGameOverScreenShowing = false
         setupInitialScene()
         playBackgroundMusic() // Ponovo pusti muziku za meni
+    }
+    
+    // --- Funkcije za Podešavanja i Teme ---
+    private func saveThemePreference() {
+        UserDefaults.standard.set(selectedThemeType.rawValue, forKey: "TrisolarisTheme")
+    }
+    
+    private func toggleTheme() {
+        let allThemes = ThemeType.allCases
+        if let currentIndex = allThemes.firstIndex(of: selectedThemeType) {
+            let nextIndex = (currentIndex + 1) % allThemes.count
+            selectedThemeType = allThemes[nextIndex]
+        }
+        activeTheme = selectedThemeType == .color ? Theme.colorful : Theme.monochrome
+        saveThemePreference()
     }
 }
 
