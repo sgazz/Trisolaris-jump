@@ -13,6 +13,7 @@ import AVFoundation
 enum PowerUpType: String {
     case jetpack
     case spring
+    case shield // Novi power-up
 }
 
 // Enum za tipove platformi
@@ -20,6 +21,32 @@ enum PlatformType {
     case normal
     case breakable // Nestaje posle skoka
     case moving    // Kreće se levo-desno
+}
+
+// Struktura za Neprijatelje
+struct Enemy {
+    let id = UUID()
+}
+
+// Struktura za čestice (Particles)
+struct Particle: Identifiable {
+    let id = UUID()
+    var position: CGPoint
+    var size: CGFloat
+    var opacity: Double
+    var creationDate = Date()
+}
+
+// Struktura za Projektile
+struct Projectile: Identifiable {
+    let id = UUID()
+    var position: CGPoint
+}
+
+// Struktura za Sakupljanje (Collectibles)
+struct Collectible: Identifiable {
+    let id = UUID()
+    var position: CGPoint
 }
 
 struct ContentView: View {
@@ -34,18 +61,44 @@ struct ContentView: View {
     @State private var tiltX: Double = 0
     @State private var totalScroll: CGFloat = 0 // Za precizno praćenje visine
     
+    // Stanja za kraj igre i najbolji skor
+    @State private var isGameOverScreenShowing = false
+    @State private var highScore = 0
+    @State private var isPaused = false
+    @State private var isSoundEnabled = true
+    
     // Audio Player
     @State private var audioPlayers: [AVAudioPlayer] = []
+    @State private var backgroundMusicPlayer: AVAudioPlayer?
     
     // Power-up stanja
     @State private var isJetpackActive = false
     @State private var jetpackFuel: TimeInterval = 0
+    
+    // Stanje za štit
+    @State private var isShieldActive = false
+    @State private var shieldTime: TimeInterval = 0
+    
+    // Stanje za čestice i projektile
+    @State private var particles: [Particle] = []
+    @State private var projectiles: [Projectile] = []
+    @State private var collectibles: [Collectible] = []
     
     let gravity: CGFloat = 0.8
     let jumpForce: CGFloat = -20
     let moveSpeed: CGFloat = 8
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
+    
+    // Konstante za težinu
+    let basePlatformWidth: CGFloat = 120
+    let minPlatformWidth: CGFloat = 70
+    
+    let baseEnemyChance: Double = 1 // u % - Smanjeno prema predlogu
+    let maxEnemyChance: Double = 10  // Ograničeno na razumnu meru
+    
+    let baseSpecialPlatformChance: Double = 5
+    let maxSpecialPlatformChance: Double = 20
     
     var body: some View {
         ZStack {
@@ -73,6 +126,33 @@ struct ContentView: View {
                     .opacity(Double.random(in: 0.3...1.0))
             }
             
+            // Čestice (Particles) - crtaju se iza svega ostalog
+            ForEach(particles) { particle in
+                Circle()
+                    .fill(particle.opacity < 0.5 ? .red : .orange)
+                    .frame(width: particle.size, height: particle.size)
+                    .position(particle.position)
+                    .opacity(particle.opacity)
+            }
+            
+            // Projektili
+            ForEach(projectiles) { projectile in
+                Capsule()
+                    .fill(Color.yellow)
+                    .frame(width: 5, height: 15)
+                    .shadow(color: .yellow, radius: 5)
+                    .position(projectile.position)
+            }
+            
+            // Collectibles (Zvezdice)
+            ForEach(collectibles) { collectible in
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                    .font(.system(size: 20))
+                    .shadow(color: .yellow, radius: 5)
+                    .position(collectible.position)
+            }
+            
             // Platforme
             ForEach(platforms, id: \.id) { platform in
                 if !platform.isBroken { // Ne prikazuj polomljene platforme
@@ -96,15 +176,40 @@ struct ContentView: View {
                                     .foregroundColor(.green)
                                     .font(.title2)
                                     .shadow(color: .green, radius: 10)
+                            case .shield:
+                                Image(systemName: "shield.fill")
+                                    .foregroundColor(.blue)
+                                    .font(.title2)
+                                    .shadow(color: .blue, radius: 10)
                             }
+                        }
+                        
+                        // Prikaz neprijatelja
+                        if platform.enemy != nil {
+                            Image(systemName: "ladybug.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.red)
+                                .offset(y: -25) // Postavi ga iznad platforme
+                                .shadow(color: .red, radius: 5)
                         }
                     }
                     .position(platform.position)
                 }
             }
             
-            // Trisolaris lik (popunjen, sa glow efektom)
+            // Trisolaris lik sa štitom
             ZStack {
+                // Aura štita
+                if isShieldActive {
+                    Circle()
+                        .stroke(Color.blue.opacity(0.8), lineWidth: 4)
+                        .frame(width: 80, height: 80)
+                        .scaleEffect(isShieldActive ? 1.0 : 0.9)
+                        .opacity(isShieldActive ? 1.0 : 0.0)
+                        .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: isShieldActive)
+                        .shadow(color: .blue, radius: 10)
+                }
+                
                 // Sivi krug
                 ZStack {
                     Circle()
@@ -144,61 +249,117 @@ struct ContentView: View {
             .rotationEffect(.degrees(rotationAngle))
             .position(playerPosition)
             
-            // UI
-            VStack {
-                HStack {
-                    Text("Score: \(score)")
-                        .font(.system(size: 36, weight: .bold, design: .monospaced)) // Unapređen izgled
-                        .foregroundColor(.white)
-                        .padding()
-                        .shadow(color: .white, radius: 5) // Glow
+            // --- UI IGRE ---
+            if isGameActive {
+                VStack {
+                    HStack {
+                        Text("Score: \(score)")
+                            .font(.system(size: 36, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
+                            .shadow(color: .white, radius: 5)
+                        
+                        Spacer()
+                        
+                        Button(action: pauseGame) {
+                            Image(systemName: "pause.circle.fill")
+                                .font(.system(size: 36))
+                                .foregroundColor(.white.opacity(0.8))
+                                .shadow(color: .white, radius: 5)
+                        }
+                    }
+                    .padding()
                     Spacer()
                 }
-                Spacer()
             }
             
-            // Kontrole
-            if !isGameActive {
-                VStack {
+            // --- GLAVNI MENI ---
+            if !isGameActive && !isGameOverScreenShowing {
+                VStack(spacing: 20) {
                     Text("TRISOLARIS JUMP")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .shadow(color: .cyan, radius: 10)
+                        .font(.largeTitle).fontWeight(.bold).foregroundColor(.white).shadow(color: .cyan, radius: 10)
                     
-                    Text("Naginjajte telefon levo/desno")
-                        .foregroundColor(.white)
-                        .font(.title3)
-                        .padding()
-                        .shadow(color: .white, radius: 3)
+                    Text("High Score: \(highScore)")
+                        .font(.title2).foregroundColor(.white.opacity(0.8))
                     
-                    Button("START") {
+                    Text("Naginjajte telefon levo/desno").foregroundColor(.white).font(.title3).padding().shadow(color: .white, radius: 3)
+                    
+                    Button("START", action: startGame)
+                        .font(.title2).foregroundColor(.white).padding().background(Color.cyan.opacity(0.3)).cornerRadius(10)
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.cyan, lineWidth: 2)).shadow(color: .cyan, radius: 10)
+                    
+                    Button(action: toggleSound) {
+                        Image(systemName: isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(.title).foregroundColor(.white)
+                    }
+                    .padding()
+                }
+            }
+            
+            // --- PAUSE MENI ---
+            if isPaused {
+                Color.black.opacity(0.6).ignoresSafeArea()
+                VStack(spacing: 30) {
+                    Text("PAUSED").font(.largeTitle).fontWeight(.bold).foregroundColor(.white).shadow(color: .white, radius: 10)
+                    
+                    Button("RESUME", action: resumeGame)
+                        .font(.title).foregroundColor(.white).padding(.horizontal, 40).padding(.vertical, 15).background(Color.green.opacity(0.8)).cornerRadius(15).shadow(color: .green, radius: 10)
+                    
+                    Button("QUIT", action: quitGame)
+                        .font(.title).foregroundColor(.white).padding(.horizontal, 40).padding(.vertical, 15).background(Color.red.opacity(0.8)).cornerRadius(15).shadow(color: .red, radius: 10)
+                }
+            }
+            
+            // Game Over Ekran
+            if isGameOverScreenShowing {
+                Color.black.opacity(0.7).ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    Text("GAME OVER")
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.red)
+                        .shadow(color: .red, radius: 10)
+                    
+                    Text("Score: \(score)")
+                        .font(.system(size: 32, design: .monospaced))
+                    
+                    Text("High Score: \(highScore)")
+                        .font(.system(size: 24, design: .monospaced))
+                    
+                    Button("RETRY") {
                         startGame()
                     }
-                    .font(.title2)
+                    .font(.title)
                     .foregroundColor(.white)
-                    .padding()
-                    .background(Color.cyan.opacity(0.3))
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.cyan, lineWidth: 2)
-                    )
-                    .shadow(color: .cyan, radius: 10)
+                    .padding(.horizontal, 40)
+                    .padding(.vertical, 15)
+                    .background(Color.green.opacity(0.8))
+                    .cornerRadius(15)
+                    .shadow(color: .green, radius: 10)
+                    .padding(.top, 20)
                 }
+                .foregroundColor(.white)
+            }
+        }
+        .onTapGesture {
+            if isGameActive {
+                shoot()
             }
         }
         .onAppear {
+            loadPreferences()
             setupInitialScene()
-            // Ne pokrećemo motion manager dok igra ne počne
+            playBackgroundMusic()
         }
         .onDisappear {
             stopMotionManager()
+            stopBackgroundMusic()
         }
     }
     
     private func setupInitialScene() {
         platforms.removeAll()
+        projectiles.removeAll()
+        collectibles.removeAll()
         
         // Kreiraj početnu, široku platformu
         let startPlatform = Platform(
@@ -218,48 +379,54 @@ struct ContentView: View {
             let yPos = startPlatform.position.y - CGFloat(i) * CGFloat.random(in: 80...95)
             addNewPlatform(at: yPos)
         }
+        isPaused = false
     }
     
     private func startGame() {
-        // Prvo, resetuj scenu na početno stanje
+        isGameOverScreenShowing = false
         setupInitialScene()
-        
-        // Resetuj sve vrednosti
         isGameActive = true
         score = 0
-        totalScroll = 0 // Resetuj visinu
+        totalScroll = 0
         isJetpackActive = false
         jetpackFuel = 0
-        
-        // Izvrši prvi skok da igra počne
+        isShieldActive = false
+        shieldTime = 0
+        particles.removeAll()
+        projectiles.removeAll()
+        collectibles.removeAll()
         jump(force: jumpForce)
         playSound(named: "jump.mp3")
-        
-        // Pokretanje motion manager-a
         setupMotionManager()
-        
-        // Pokretanje animacije rotacije
-        withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-            rotationAngle = 360
-        }
-        
-        // Game loop
-        gameTimer = Timer.scheduledTimer(withTimeInterval: 1/60, repeats: true) { _ in
-            updateGame()
-        }
+        withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) { rotationAngle = 360 }
+        gameTimer = Timer.scheduledTimer(withTimeInterval: 1/60, repeats: true) { _ in updateGame() }
     }
     
     private func updateGame() {
+        if !isGameActive || isPaused { return }
+
+        // Ažuriranje čestica
+        updateParticles()
+
+        // Ažuriranje štita
+        if isShieldActive {
+            shieldTime -= 1/60
+            if shieldTime <= 0 {
+                isShieldActive = false
+            }
+        }
+
+        // Provera sudara sa neprijateljem
+        checkEnemyCollision()
+        if !isGameActive { return } // Ako je igra gotova, prekini petlju
+
         // Fizika
         if isJetpackActive {
-            // Jetpack fizika - leti nagore
             playerVelocity = -25
             jetpackFuel -= 1/60
-            if jetpackFuel <= 0 {
-                isJetpackActive = false
-            }
+            emitJetpackTrail() // Emisija čestica za Jetpack
+            if jetpackFuel <= 0 { isJetpackActive = false }
         } else {
-            // Normalna fizika sa gravitacijom
             playerVelocity += gravity
         }
         
@@ -326,6 +493,9 @@ struct ContentView: View {
             }
         }
         
+        // Provera sakupljanja
+        checkCollectibles()
+        
         // Ažuriranje skora na osnovu visine
         score = Int(totalScroll / 10)
     }
@@ -343,22 +513,46 @@ struct ContentView: View {
                playerPosition.x <= platform.position.x + platform.width/2 &&
                playerVelocity > 0 && !platforms[i].isBroken {
                 
-                // Pusti zvuk i izvrši akciju na osnovu tipa platforme
+                emitJumpParticles(at: CGPoint(x: playerPosition.x, y: playerPosition.y + 25))
+                
                 if let powerUp = platform.powerUp {
                     activatePowerUp(powerUp)
-                    platforms[i].powerUp = nil // Ukloni power-up nakon korišćenja
+                    platforms[i].powerUp = nil
                 } else if platforms[i].type == .breakable {
                     platforms[i].isBreaking = true
                     playSound(named: "break.mp3")
-                    jump(force: jumpForce) // I dalje skoči sa nje
+                    jump(force: jumpForce)
                 } else {
-                    // Normalan skok
                     playSound(named: "jump.mp3")
                     jump(force: jumpForce)
                 }
                 
                 playerPosition.y = platform.position.y - 20
                 break
+            }
+        }
+    }
+    
+    private func checkEnemyCollision() {
+        for i in platforms.indices {
+            if platforms[i].enemy != nil {
+                let enemyPosition = CGPoint(x: platforms[i].position.x, y: platforms[i].position.y - 25)
+                let distance = hypot(playerPosition.x - enemyPosition.x, playerPosition.y - enemyPosition.y)
+
+                if distance < 45 {
+                    if isShieldActive {
+                        // Uništi neprijatelja
+                        emitExplosion(at: enemyPosition, color: .red)
+                        playSound(named: "shield_block.mp3")
+                        platforms[i].enemy = nil
+                        isShieldActive = false // Štit se troši
+                    } else {
+                        // Kraj igre
+                        playSound(named: "hit.mp3")
+                        gameOver()
+                    }
+                    return
+                }
             }
         }
     }
@@ -370,53 +564,89 @@ struct ContentView: View {
     private func addNewPlatform(at yPosition: CGFloat? = nil) {
         let yPos = yPosition ?? (platforms.map({ $0.position.y }).min() ?? screenHeight) - CGFloat.random(in: 60...100)
         
+        // --- Dinamička težina ---
+        let difficultyMultiplier = min(1.0, CGFloat(score) / 1500.0) // Sporije povećanje, max na 1500 poena
+        
+        // Smanji širinu platformi
+        let currentMaxWidth = basePlatformWidth - (basePlatformWidth - minPlatformWidth) * difficultyMultiplier
+        let platformWidth = CGFloat.random(in: minPlatformWidth...currentMaxWidth)
+        
+        // Povećaj šansu za specijalne platforme
+        let specialPlatformChance = baseSpecialPlatformChance + (maxSpecialPlatformChance - baseSpecialPlatformChance) * Double(difficultyMultiplier)
+        
+        // Povećaj šansu za neprijatelje
+        let enemyChance = baseEnemyChance + (maxEnemyChance - baseEnemyChance) * Double(difficultyMultiplier)
+        // --- Kraj dinamičke težine ---
+        
         // Određivanje tipa platforme
         var platformType = PlatformType.normal
-        if Int.random(in: 1...100) <= 5 { // 5% šanse za specijalnu platformu
+        if Double.random(in: 1...100) <= specialPlatformChance {
             platformType = [.breakable, .moving].randomElement()!
         }
         
         var color: Color
         switch platformType {
-        case .normal:
-            color = [.green, .blue, .purple, .orange].randomElement() ?? .green
-        case .breakable:
-            color = Color(.brown) // Smeđa za lomljive
-        case .moving:
-            color = .gray // Siva za pokretne
+        case .normal: color = [.green, .blue, .purple, .orange].randomElement() ?? .green
+        case .breakable: color = Color(.brown)
+        case .moving: color = .gray
         }
         
         var newPlatform = Platform(
-            position: CGPoint(
-                x: CGFloat.random(in: 50...(screenWidth - 50)),
-                y: yPos
-            ),
-            width: CGFloat.random(in: 60...120),
+            position: CGPoint(x: CGFloat.random(in: 50...(screenWidth - 50)), y: yPos),
+            width: platformWidth, // Koristi dinamičku širinu
             color: color,
             type: platformType
         )
         
-        // Postavljanje brzine za pokretne platforme
         if platformType == .moving {
             newPlatform.velocity = CGPoint(x: [-1.5, 1.5].randomElement()!, y: 0)
         }
         
-        // Šansa za dodavanje power-up-a (15%) - samo na normalnim platformama
-        if platformType == .normal && Int.random(in: 0...100) < 15 {
-            newPlatform.powerUp = [.jetpack, .spring].randomElement()
+        let spawnRoll = Double.random(in: 0...100)
+        if platformType == .normal {
+            if spawnRoll < enemyChance { // Koristi dinamičku šansu
+                newPlatform.enemy = Enemy()
+            } else if spawnRoll < enemyChance + 15 { // 15% šanse za power-up
+                newPlatform.powerUp = [.jetpack, .spring, .shield].randomElement()
+            }
         }
         
         platforms.append(newPlatform)
+        
+        // Dodaj zvezdicu između platformi (20% šanse)
+        if Double.random(in: 0...100) < 20 {
+            if let lastPlatform = platforms.last(where: { $0.id != newPlatform.id }) {
+                let xPos = CGFloat.random(in: 50...screenWidth - 50)
+                let yPos = (newPlatform.position.y + lastPlatform.position.y) / 2
+                let newCollectible = Collectible(position: CGPoint(x: xPos, y: yPos))
+                collectibles.append(newCollectible)
+            }
+        }
     }
     
     private func gameOver() {
+        if !isGameActive { return }
         isGameActive = false
         gameTimer?.invalidate()
         gameTimer = nil
         rotationAngle = 0
         isJetpackActive = false
         stopMotionManager()
+        isShieldActive = false
+        particles.removeAll()
+        projectiles.removeAll()
+        collectibles.removeAll()
+        
+        // Logika za najbolji skor
+        if score > highScore {
+            highScore = score
+            saveHighScore()
+        }
+        
+        // Pusti zvuk i prikaži ekran za kraj igre
         playSound(named: "gameover.mp3")
+        isGameOverScreenShowing = true
+        stopBackgroundMusic()
     }
     
     private func activatePowerUp(_ type: PowerUpType) {
@@ -428,6 +658,10 @@ struct ContentView: View {
         case .spring:
             jump(force: jumpForce * 2.5) // Duplo jači skok
             playSound(named: "spring.mp3")
+        case .shield:
+            isShieldActive = true
+            shieldTime = 5.0 // Trajanje štita u sekundama
+            playSound(named: "shield_on.mp3")
         }
     }
     
@@ -445,12 +679,41 @@ struct ContentView: View {
         motionManager.stopAccelerometerUpdates()
     }
     
-    // --- Funkcija za Zvuk ---
+    // --- Funkcije za Zvuk i Skor ---
+    
+    private func loadHighScore() {
+        highScore = UserDefaults.standard.integer(forKey: "TrisolarisJumpHighScore")
+    }
+    
+    private func saveHighScore() {
+        UserDefaults.standard.set(highScore, forKey: "TrisolarisJumpHighScore")
+    }
+    
+    private func loadPreferences() {
+        highScore = UserDefaults.standard.integer(forKey: "TrisolarisJumpHighScore")
+        isSoundEnabled = !UserDefaults.standard.bool(forKey: "TrisolarisJumpMuted")
+    }
+    
+    private func saveSoundPreference() {
+        UserDefaults.standard.set(!isSoundEnabled, forKey: "TrisolarisJumpMuted")
+    }
+    
+    private func toggleSound() {
+        isSoundEnabled.toggle()
+        saveSoundPreference()
+        if isSoundEnabled {
+            playBackgroundMusic()
+        } else {
+            stopBackgroundMusic()
+            audioPlayers.forEach { $0.stop() }
+            audioPlayers.removeAll()
+        }
+    }
+    
     private func playSound(named soundName: String) {
-        // Potrebno je da dodate zvučne fajlove (npr. jump.mp3) u vaš projekat.
-        // Idite na File -> Add Files to "Jump Doodle Jump"...
+        guard isSoundEnabled else { return }
         guard let path = Bundle.main.path(forResource: soundName, ofType: nil) else {
-            print("Zvučni fajl '\(soundName)' nije pronađen.")
+            print("Zvučni fajl '\(soundName)' nije pronađen. Dodajte 'hit.mp3' u projekat.")
             return
         }
         
@@ -467,6 +730,160 @@ struct ContentView: View {
             print("Greška pri reprodukciji zvuka: \(error.localizedDescription)")
         }
     }
+    
+    private func playBackgroundMusic() {
+        guard isSoundEnabled, backgroundMusicPlayer == nil else {
+            backgroundMusicPlayer?.play()
+            return
+        }
+        guard let path = Bundle.main.path(forResource: "background.mp3", ofType: nil) else {
+            print("Zvučni fajl 'background.mp3' nije pronađen.")
+            return
+        }
+        do {
+            backgroundMusicPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
+            backgroundMusicPlayer?.numberOfLoops = -1 // Ponavljaj beskonačno
+            backgroundMusicPlayer?.volume = 0.3
+            backgroundMusicPlayer?.play()
+        } catch {
+            print("Greška pri reprodukciji pozadinske muzike.")
+        }
+    }
+    
+    private func stopBackgroundMusic() {
+        backgroundMusicPlayer?.stop()
+        backgroundMusicPlayer = nil // Oslobodi memoriju
+    }
+    
+    // --- Funkcije za čestice ---
+    
+    private func emitJetpackTrail() {
+        let particle = Particle(
+            position: CGPoint(x: playerPosition.x, y: playerPosition.y + 20),
+            size: CGFloat.random(in: 5...15),
+            opacity: 1.0
+        )
+        particles.append(particle)
+    }
+
+    private func emitJumpParticles(at position: CGPoint) {
+        for _ in 0..<10 {
+            let particle = Particle(
+                position: position,
+                size: CGFloat.random(in: 2...8),
+                opacity: 1.0
+            )
+            particles.append(particle)
+        }
+    }
+    
+    private func emitExplosion(at position: CGPoint, color: Color) {
+        for _ in 0..<30 {
+            let particle = Particle(
+                position: position,
+                size: CGFloat.random(in: 3...12),
+                opacity: 1.0
+            )
+            particles.append(particle)
+        }
+    }
+    
+    private func updateParticles() {
+        for i in (0..<particles.count).reversed() {
+            particles[i].opacity -= 0.05
+            
+            // Dodaj malo gravitacije česticama
+            particles[i].position.y += 1
+            
+            if particles[i].opacity <= 0 {
+                particles.remove(at: i)
+            }
+        }
+    }
+    
+    // --- Funkcija za pucanje ---
+    private func shoot() {
+        let newProjectile = Projectile(position: CGPoint(x: playerPosition.x, y: playerPosition.y - 40))
+        projectiles.append(newProjectile)
+        playSound(named: "shoot.mp3")
+    }
+    
+    // --- Funkcije za ažuriranje ---
+    
+    private func checkCollectibles() {
+        for i in (0..<collectibles.count).reversed() {
+            let collectible = collectibles[i]
+            let distance = hypot(playerPosition.x - collectible.position.x, playerPosition.y - collectible.position.y)
+            
+            if distance < 40 { // Radijus sakupljanja
+                score += 25 // Bonus poeni
+                playSound(named: "collect.mp3")
+                emitExplosion(at: collectible.position, color: .yellow) // "Poof" efekat
+                collectibles.remove(at: i)
+            }
+        }
+    }
+    
+    private func updateProjectiles() {
+        for i in (0..<projectiles.count).reversed() {
+            projectiles[i].position.y -= 20 // Brzina projektila
+            
+            // Ukloni ako je van ekrana
+            if projectiles[i].position.y < 0 {
+                projectiles.remove(at: i)
+                continue
+            }
+            
+            // Provera sudara sa neprijateljima
+            for j in (0..<platforms.count).reversed() {
+                // Dodatna provera jer se nizovi menjaju unutar petlji
+                guard i < projectiles.count, j < platforms.count else { continue }
+                
+                if platforms[j].enemy != nil {
+                    let enemyPosition = CGPoint(x: platforms[j].position.x, y: platforms[j].position.y - 25)
+                    let projectilePosition = projectiles[i].position
+                    
+                    // Jednostavna provera kolizije
+                    if abs(projectilePosition.x - enemyPosition.x) < 20 && abs(projectilePosition.y - enemyPosition.y) < 20 {
+                        emitExplosion(at: enemyPosition, color: .red)
+                        playSound(named: "enemy_hit.mp3")
+                        
+                        platforms[j].enemy = nil // Ukloni neprijatelja
+                        projectiles.remove(at: i) // Ukloni projektil
+                        
+                        score += 50 // Bonus poeni
+                        
+                        break // Prekini petlju za neprijatelje, jer je projektil uništen
+                    }
+                }
+            }
+        }
+    }
+    
+    // --- Kontrole Stanja Igre ---
+    private func pauseGame() {
+        if isGameActive {
+            isPaused = true
+            gameTimer?.invalidate()
+            stopMotionManager()
+            backgroundMusicPlayer?.pause()
+        }
+    }
+    
+    private func resumeGame() {
+        isPaused = false
+        setupMotionManager()
+        gameTimer = Timer.scheduledTimer(withTimeInterval: 1/60, repeats: true) { _ in updateGame() }
+        backgroundMusicPlayer?.play()
+    }
+    
+    private func quitGame() {
+        isPaused = false
+        isGameActive = false
+        isGameOverScreenShowing = false
+        setupInitialScene()
+        playBackgroundMusic() // Ponovo pusti muziku za meni
+    }
 }
 
 struct Platform {
@@ -475,6 +892,7 @@ struct Platform {
     let width: CGFloat
     var color: Color
     var powerUp: PowerUpType?
+    var enemy: Enemy?
     var type: PlatformType
     var velocity: CGPoint = .zero // Za pokretne platforme
     var isBroken: Bool = false
