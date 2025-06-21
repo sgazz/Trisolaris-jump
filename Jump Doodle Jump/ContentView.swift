@@ -94,6 +94,16 @@ struct Particle: Identifiable {
     var creationDate = Date()
 }
 
+// Struktura za zvezdanu prašinu (Star Dust)
+struct StarDust: Identifiable {
+    let id = UUID()
+    var position: CGPoint
+    var size: CGFloat
+    var opacity: Double
+    var velocity: CGPoint
+    var creationDate = Date()
+}
+
 // Struktura za Projektile
 struct Projectile: Identifiable {
     let id = UUID()
@@ -140,6 +150,7 @@ struct ContentView: View {
     @State private var particles: [Particle] = []
     @State private var projectiles: [Projectile] = []
     @State private var collectibles: [Collectible] = []
+    @State private var starDust: [StarDust] = [] // Nova zvezdana prašina
     
     // Stanja za Teme
     @State private var activeTheme: Theme = Theme.colorful
@@ -156,7 +167,7 @@ struct ContentView: View {
     let minPlatformWidth: CGFloat = 70
     
     let baseEnemyChance: Double = 1 // u % - Smanjeno prema predlogu
-    let maxEnemyChance: Double = 10  // Ograničeno na razumnu meru
+    let maxEnemyChance: Double = 3  // Smanjeno sa 10 na 3%
     
     let baseSpecialPlatformChance: Double = 5
     let maxSpecialPlatformChance: Double = 20
@@ -185,6 +196,16 @@ struct ContentView: View {
                     .frame(width: particle.size, height: particle.size)
                     .position(particle.position)
                     .opacity(particle.opacity)
+            }
+            
+            // Zvezdana prašina (Star Dust) - rep Trisolaris-a
+            ForEach(starDust) { dust in
+                Circle()
+                    .fill(selectedThemeType == .monochrome ? Color(white: 0.8).opacity(0.6) : activeTheme.accent.opacity(0.6))
+                    .frame(width: dust.size, height: dust.size)
+                    .position(dust.position)
+                    .opacity(dust.opacity)
+                    .blur(radius: 1)
             }
             
             // Projektili
@@ -262,39 +283,39 @@ struct ContentView: View {
                         .shadow(color: activeTheme.shield, radius: 10)
                 }
                 
-                // Sivi krug
+                // Sivi krug sa X simbolom
                 ZStack {
                     Circle()
                         .fill(activeTheme.trisolaris[0])
                         .frame(width: 30, height: 30)
                         .shadow(color: activeTheme.trisolaris[0], radius: 8)
-                    Text("+")
+                    Text("✕")
                         .foregroundColor(.black.opacity(0.7))
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                 }
                 .offset(x: 0, y: -22)
 
-                // Crveni krug
+                // Crveni krug sa trouglom
                 ZStack {
                     Circle()
                         .fill(activeTheme.trisolaris[1])
                         .frame(width: 30, height: 30)
                         .shadow(color: activeTheme.trisolaris[1], radius: 8)
-                    Text("+")
+                    Text("▲")
                         .foregroundColor(.white.opacity(0.8))
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                 }
                 .offset(x: -19, y: 11)
 
-                // Zeleni krug
+                // Zeleni krug sa kvadratom
                 ZStack {
                     Circle()
                         .fill(activeTheme.trisolaris[2])
                         .frame(width: 30, height: 30)
                         .shadow(color: activeTheme.trisolaris[2], radius: 8)
-                    Text("+")
+                    Text("■")
                         .foregroundColor(.white.opacity(0.8))
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 14, weight: .bold))
                 }
                 .offset(x: 19, y: 11)
             }
@@ -446,6 +467,7 @@ struct ContentView: View {
         particles.removeAll()
         projectiles.removeAll()
         collectibles.removeAll()
+        starDust.removeAll() // Očisti zvezdanu prašinu
         jump(force: jumpForce)
         playSound(named: "jump.mp3")
         setupMotionManager()
@@ -458,6 +480,9 @@ struct ContentView: View {
 
         // Ažuriranje čestica
         updateParticles()
+        
+        // Ažuriranje zvezdane prašine
+        updateStarDust()
 
         // Ažuriranje štita
         if isShieldActive {
@@ -475,7 +500,10 @@ struct ContentView: View {
         if isJetpackActive {
             playerVelocity = -25
             jetpackFuel -= 1/60
-            emitJetpackTrail() // Emisija čestica za Jetpack
+            // Emituj čestice samo svaki 3. frame za bolju performansu
+            if Int(Date().timeIntervalSince1970 * 60) % 3 == 0 {
+                emitJetpackTrail()
+            }
             if jetpackFuel <= 0 { isJetpackActive = false }
         } else {
             playerVelocity += gravity
@@ -616,7 +644,7 @@ struct ContentView: View {
         let yPos = yPosition ?? (platforms.map({ $0.position.y }).min() ?? screenHeight) - CGFloat.random(in: 60...100)
         
         // --- Dinamička težina ---
-        let difficultyMultiplier = min(1.0, CGFloat(score) / 1500.0) // Sporije povećanje, max na 1500 poena
+        let difficultyMultiplier = min(1.0, CGFloat(score) / 30000.0) // Sporije povećanje, max na 30000 poena
         
         // Smanji širinu platformi
         let currentMaxWidth = basePlatformWidth - (basePlatformWidth - minPlatformWidth) * difficultyMultiplier
@@ -625,7 +653,7 @@ struct ContentView: View {
         // Povećaj šansu za specijalne platforme
         let specialPlatformChance = baseSpecialPlatformChance + (maxSpecialPlatformChance - baseSpecialPlatformChance) * Double(difficultyMultiplier)
         
-        // Povećaj šansu za neprijatelje
+        // Povećaj šansu za neprijatelje - mnogo sporije
         let enemyChance = baseEnemyChance + (maxEnemyChance - baseEnemyChance) * Double(difficultyMultiplier)
         // --- Kraj dinamičke težine ---
         
@@ -687,6 +715,7 @@ struct ContentView: View {
         particles.removeAll()
         projectiles.removeAll()
         collectibles.removeAll()
+        starDust.removeAll() // Očisti zvezdanu prašinu
         
         // Logika za najbolji skor
         if score > highScore {
@@ -819,6 +848,37 @@ struct ContentView: View {
             opacity: 1.0
         )
         particles.append(particle)
+        
+        // Dodaj zvezdanu prašinu za rep - optimizovano
+        if starDust.count < 20 { // Ograniči broj čestica za bolju performansu
+            emitStarDust()
+        }
+    }
+    
+    private func emitStarDust() {
+        // Emituj zvezdanu prašinu iza Trisolaris-a - optimizovano
+        let trisolarisHeight: CGFloat = 60
+        let repLength = trisolarisHeight * 2
+        
+        // Emituj manje čestica ali redovnije
+        for i in 0..<4 { // Smanjeno sa 8 na 4
+            let progress = Double(i) / 3.0
+            let yOffset = progress * repLength
+            
+            let dust = StarDust(
+                position: CGPoint(
+                    x: playerPosition.x + CGFloat.random(in: -10...10), // Smanjen raspon
+                    y: playerPosition.y + 20 + yOffset
+                ),
+                size: CGFloat.random(in: 3...8) * (1.0 - progress * 0.3), // Veće čestice
+                opacity: 0.9 * (1.0 - progress * 0.2), // Veća početna providnost
+                velocity: CGPoint(
+                    x: CGFloat.random(in: -0.5...0.5), // Smanjena brzina
+                    y: CGFloat.random(in: 0.3...1.0)
+                )
+            )
+            starDust.append(dust)
+        }
     }
 
     private func emitJumpParticles(at position: CGPoint) {
@@ -844,14 +904,40 @@ struct ContentView: View {
     }
     
     private func updateParticles() {
+        // Ograniči broj čestica za bolju performansu
+        if particles.count > 50 {
+            particles.removeFirst(particles.count - 50)
+        }
+        
         for i in (0..<particles.count).reversed() {
-            particles[i].opacity -= 0.05
+            particles[i].opacity -= 0.03 // Smanjeno sa 0.05 za sporije nestajanje
             
             // Dodaj malo gravitacije česticama
-            particles[i].position.y += 1
+            particles[i].position.y += 0.8 // Smanjeno sa 1
             
             if particles[i].opacity <= 0 {
                 particles.remove(at: i)
+            }
+        }
+    }
+    
+    private func updateStarDust() {
+        // Ograniči broj čestica za bolju performansu
+        if starDust.count > 30 {
+            starDust.removeFirst(starDust.count - 30)
+        }
+        
+        for i in (0..<starDust.count).reversed() {
+            // Pomeri zvezdanu prašinu
+            starDust[i].position.x += starDust[i].velocity.x
+            starDust[i].position.y += starDust[i].velocity.y
+            
+            // Smanji opacity sporije za duži trajnost
+            starDust[i].opacity -= 0.015 // Smanjeno sa 0.02
+            
+            // Ukloni ako je potpuno providna ili van ekrana
+            if starDust[i].opacity <= 0 || starDust[i].position.y > screenHeight + 50 {
+                starDust.remove(at: i)
             }
         }
     }
