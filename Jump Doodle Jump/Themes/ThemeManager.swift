@@ -13,6 +13,7 @@ enum ThemeType: String, CaseIterable {
     case monochrome = "Monochrome"
     case pixel = "Pixel Art"
     case luxury = "Luxury"
+    case wired = "Wired"
 }
 
 struct Theme {
@@ -98,6 +99,23 @@ struct Theme {
         textColor: Color(red: 1.0, green: 0.84, blue: 0.0), // Gold
         buttonTextColor: .black
     )
+    
+    static let wired = Theme(
+        accent: Color(red: 0.0, green: 1.0, blue: 0.5), // Neon cyan
+        backgroundGradient: [.black, Color(red: 0.05, green: 0.1, blue: 0.05), Color(red: 0.1, green: 0.2, blue: 0.1)], // Dark green gradient
+        trisolaris: [Color(red: 0.0, green: 1.0, blue: 0.5), Color(red: 1.0, green: 0.0, blue: 0.5), Color(red: 0.0, green: 0.5, blue: 1.0)], // Neon cyan, magenta, blue
+        platformNormal: [Color(red: 0.0, green: 1.0, blue: 0.5), Color(red: 0.5, green: 0.0, blue: 1.0), Color(red: 1.0, green: 0.5, blue: 0.0)], // Neon cyan, purple, orange
+        platformBreakable: Color(red: 0.8, green: 0.2, blue: 0.2), // Dark red
+        platformMoving: Color(red: 0.3, green: 0.3, blue: 0.3), // Dark gray
+        enemy: Color(red: 1.0, green: 0.0, blue: 0.0), // Bright red
+        projectile: Color(red: 0.0, green: 1.0, blue: 0.5), // Neon cyan
+        collectible: Color(red: 1.0, green: 1.0, blue: 0.0), // Bright yellow
+        shield: Color(red: 0.0, green: 1.0, blue: 0.5), // Neon cyan
+        particleJetpack: Color(red: 0.0, green: 1.0, blue: 0.5), // Neon cyan
+        particleExplosion: Color(red: 1.0, green: 0.0, blue: 0.0), // Bright red
+        textColor: Color(red: 0.0, green: 1.0, blue: 0.5), // Neon cyan
+        buttonTextColor: .black
+    )
 }
 
 class ThemeManager: ObservableObject {
@@ -126,6 +144,8 @@ class ThemeManager: ObservableObject {
             currentTheme = Theme.pixel
         case .luxury:
             currentTheme = Theme.luxury
+        case .wired:
+            currentTheme = Theme.wired
         }
     }
     

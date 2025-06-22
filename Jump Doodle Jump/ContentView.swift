@@ -118,6 +118,31 @@ struct ContentView: View {
             LinearGradient(gradient: Gradient(colors: themeManager.currentTheme.backgroundGradient), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
             
+            // Wired efekti - scanlines i tehno pozadina
+            if themeManager.selectedThemeType == .wired {
+                // Scanlines efekat
+                VStack(spacing: 2) {
+                    ForEach(0..<Int(screenHeight / 4), id: \.self) { _ in
+                        Rectangle()
+                            .fill(Color(red: 0.0, green: 1.0, blue: 0.5).opacity(0.1))
+                            .frame(height: 1)
+                    }
+                }
+                
+                // Tehno grid pozadina
+                VStack(spacing: 20) {
+                    ForEach(0..<Int(screenHeight / 20), id: \.self) { _ in
+                        HStack(spacing: 20) {
+                            ForEach(0..<Int(screenWidth / 20), id: \.self) { _ in
+                                Rectangle()
+                                    .fill(Color(red: 0.0, green: 1.0, blue: 0.5).opacity(0.05))
+                                    .frame(width: 1, height: 1)
+                            }
+                        }
+                    }
+                }
+            }
+            
             // Zvezde u pozadini
             ForEach(0..<50, id: \.self) { _ in
                 Circle()
@@ -176,6 +201,28 @@ struct ContentView: View {
                             .frame(width: platform.width, height: 20)
                             .shadow(color: platform.color, radius: 8)
                             .opacity(platform.opacity) // Za efekat nestajanja
+                            .overlay(
+                                // Wired efekti za platforme
+                                Group {
+                                    if themeManager.selectedThemeType == .wired {
+                                        // Neon glow
+                                        Rectangle()
+                                            .stroke(platform.color, lineWidth: 2)
+                                            .frame(width: platform.width, height: 20)
+                                            .shadow(color: platform.color, radius: 5)
+                                        
+                                        // Scanlines na platformi
+                                        VStack(spacing: 1) {
+                                            ForEach(0..<10, id: \.self) { _ in
+                                                Rectangle()
+                                                    .fill(platform.color.opacity(0.3))
+                                                    .frame(height: 1)
+                                            }
+                                        }
+                                        .frame(width: platform.width, height: 20)
+                                    }
+                                }
+                            )
                         
                         // Prikaz power-up-a na platformi
                         if let powerUp = platform.powerUp {
@@ -255,6 +302,17 @@ struct ContentView: View {
                         .fill(themeManager.currentTheme.trisolaris[0])
                         .frame(width: 30, height: 30)
                         .shadow(color: themeManager.currentTheme.trisolaris[0], radius: 8)
+                        .overlay(
+                            // Wired efekti za Trisolaris
+                            Group {
+                                if themeManager.selectedThemeType == .wired {
+                                    Circle()
+                                        .stroke(themeManager.currentTheme.trisolaris[0], lineWidth: 2)
+                                        .frame(width: 30, height: 30)
+                                        .shadow(color: themeManager.currentTheme.trisolaris[0], radius: 3)
+                                }
+                            }
+                        )
                     Text("✕")
                         .foregroundColor(.black.opacity(0.7))
                         .font(.system(size: 18, weight: .bold))
@@ -267,6 +325,17 @@ struct ContentView: View {
                         .fill(themeManager.currentTheme.trisolaris[1])
                         .frame(width: 30, height: 30)
                         .shadow(color: themeManager.currentTheme.trisolaris[1], radius: 8)
+                        .overlay(
+                            // Wired efekti za Trisolaris
+                            Group {
+                                if themeManager.selectedThemeType == .wired {
+                                    Circle()
+                                        .stroke(themeManager.currentTheme.trisolaris[1], lineWidth: 2)
+                                        .frame(width: 30, height: 30)
+                                        .shadow(color: themeManager.currentTheme.trisolaris[1], radius: 3)
+                                }
+                            }
+                        )
                     Text("▲")
                         .foregroundColor(.white.opacity(0.8))
                         .font(.system(size: 16, weight: .bold))
@@ -279,6 +348,17 @@ struct ContentView: View {
                         .fill(themeManager.currentTheme.trisolaris[2])
                         .frame(width: 30, height: 30)
                         .shadow(color: themeManager.currentTheme.trisolaris[2], radius: 8)
+                        .overlay(
+                            // Wired efekti za Trisolaris
+                            Group {
+                                if themeManager.selectedThemeType == .wired {
+                                    Circle()
+                                        .stroke(themeManager.currentTheme.trisolaris[2], lineWidth: 2)
+                                        .frame(width: 30, height: 30)
+                                        .shadow(color: themeManager.currentTheme.trisolaris[2], radius: 3)
+                                }
+                            }
+                        )
                     Text("■")
                         .foregroundColor(.white.opacity(0.8))
                         .font(.system(size: 14, weight: .bold))
@@ -296,6 +376,18 @@ struct ContentView: View {
                             .font(.system(size: 36, weight: .bold, design: .monospaced))
                             .foregroundColor(themeManager.currentTheme.textColor)
                             .shadow(color: themeManager.currentTheme.textColor, radius: 5)
+                            .overlay(
+                                // Wired efekti za UI
+                                Group {
+                                    if themeManager.selectedThemeType == .wired {
+                                        Text("Score: \(score)")
+                                            .font(.system(size: 36, weight: .bold, design: .monospaced))
+                                            .foregroundColor(themeManager.currentTheme.textColor.opacity(0.3))
+                                            .offset(x: 1, y: 1)
+                                            .blur(radius: 1)
+                                    }
+                                }
+                            )
                         
                         Spacer()
                         
@@ -316,6 +408,17 @@ struct ContentView: View {
                 VStack(spacing: 20) {
                     Text("TRISOLARIS JUMP")
                         .font(.largeTitle).fontWeight(.bold).foregroundColor(themeManager.currentTheme.textColor).shadow(color: themeManager.currentTheme.accent, radius: 10)
+                        .overlay(
+                            // Wired efekti za naslov
+                            Group {
+                                if themeManager.selectedThemeType == .wired {
+                                    Text("TRISOLARIS JUMP")
+                                        .font(.largeTitle).fontWeight(.bold).foregroundColor(themeManager.currentTheme.textColor.opacity(0.3))
+                                        .offset(x: 2, y: 2)
+                                        .blur(radius: 2)
+                                }
+                            }
+                        )
                     
                     Text("High Score: \(highScore)")
                         .font(.title2).foregroundColor(themeManager.currentTheme.textColor.opacity(0.8))
@@ -585,7 +688,14 @@ struct ContentView: View {
                 let distance = hypot(playerPosition.x - enemyPosition.x, playerPosition.y - enemyPosition.y)
 
                 if distance < 45 {
-                    if isShieldActive {
+                    // Trisolaris je imun na neprijatelje kada je jetpack aktivan
+                    if isJetpackActive {
+                        // Uništi neprijatelja bez gubljenja jetpack-a
+                        emitExplosion(at: enemyPosition)
+                        playSound(named: "enemy_hit.mp3")
+                        platforms[i].enemy = nil
+                        score += 50 // Bonus poeni
+                    } else if isShieldActive {
                         // Uništi neprijatelja
                         emitExplosion(at: enemyPosition)
                         playSound(named: "shield_block.mp3")
