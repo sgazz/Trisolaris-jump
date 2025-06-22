@@ -1,0 +1,36 @@
+Subject: Testiraj Trisolaris Jump - Nova kosmička igra! 🚀
+
+Pozdrav!
+
+Pozivam te da testiraš moju novu igru Trisolaris Jump!
+
+🎮 O igri:
+Trisolaris Jump je akciona platformer igra gde kontrolišete kosmičko biće sa tri tela koje skače kroz svemir. Igra ima 4 jedinstvene teme, power-up sisteme i kosmičke efekte.
+
+📱 Kako testirati:
+1. Instaliraj TestFlight aplikaciju sa App Store-a
+2. Klikni na link koji ćeš dobiti u sledećem email-u
+3. Prihvati poziv za testiranje
+4. Instaliraj Trisolaris Jump
+5. Igraj i javi mi feedback!
+
+🎯 Šta testirati:
+- Osnovna mehanika skakanja
+- Kontrola naginjanjem telefona
+- Power-up sistemi (Jetpack, Spring, Shield)
+- Različite teme (Monochrome, Pixel Art, Luxury, Wired)
+- Audio efekti i muzika
+- Sistem bodovanja
+- Čestice i vizuelni efekti
+- Kolizije sa neprijateljima
+- Sakupljanje zvezdica
+
+🚀 Kontrole:
+- Naginjanje levo/desno za kretanje
+- Tap za pucanje projektila
+- Automatsko skakanje na platforme
+
+Hvala na pomoći! 🚀
+
+Pozdrav,
+[Vaše ime]

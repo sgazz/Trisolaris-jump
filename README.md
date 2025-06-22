@@ -1,249 +1,214 @@
 # 🚀 Trisolaris Jump
 
-**Kosmička platformer igra inspirisana "The Three-Body Problem" serijom**
+**Kosmička platformer igra inspirisana "The Three-Body Problem"**
 
-![Trisolaris Jump](https://img.shields.io/badge/Platform-iOS-blue) ![Swift](https://img.shields.io/badge/Swift-5.0-orange) ![SwiftUI](https://img.shields.io/badge/SwiftUI-2.0-green)
+## 🎮 O igri
 
-## 🌟 O igri
+Trisolaris Jump je akciona platformer igra gde kontrolišete Trisolaris - kosmičko biće sa tri tela (X, ▲, ■) koje skače kroz svemir, izbegava neprijatelje i sakuplja zvezdice. Igra kombinuje klasičnu mehaniku skakanja sa modernim vizuelnim efektima i kosmičkom temom.
 
-Trisolaris Jump je zabavna platformer igra gde kontrolišete Trisolaris - kosmičko biće sa tri tela (X, trougao, kvadrat) koje skače po platformama u beskonačnom svemiru. Igra kombinuje fizičku mehaniku skakanja sa kosmičkim temama, dinamičkim power-up sistemom i 5 jedinstvenih vizuelnih tema.
+## 🌟 Glavne karakteristike
 
-### 🎮 Glavni lik
-- **Trisolaris:** Kosmičko biće sa tri tela u obliku X, trougla i kvadrata
-- **Srebrni rep:** Magični rep od zvezdane prašine koji ostavlja trag
-- **Rotacija:** Kontinuirana rotacija za kosmički efekat
-- **Planeta Y:** Mala planeta koja se okrece oko Trisolaris-a kao štit
+### 🎯 Trisolaris lik
+- **Tri tela:** Sivi krug sa X, crveni krug sa trouglom, zeleni krug sa kvadratom
+- **Zvezdana prašina:** Efektni rep od čestica koji prati Trisolaris
+- **Rotacija:** Kontinuirana rotacija za dinamičan izgled
+- **Štit:** Orbitalna planeta Y koja štiti od neprijatelja
 
-## ✨ Funkcionalnosti
+### 🎨 Teme
+- **Monochrome:** Elegantna crno-bela tema sa srebrnim efektima
+- **Pixel Art:** Retro piksel stil sa živim bojama
+- **Luxury:** Premium zlatno-crna tema sa luksuznim efektima
+- **Wired:** Cyberpunk neon tema sa scanlines i tehno efektima
 
-### 🎯 Osnovna mehanika
-- **Skakanje:** Fizički realistično skakanje sa gravitacijom
-- **Kretanje:** Kontrola naginjanjem telefona levo/desno
-- **Pucanje:** Tap na ekran za pucanje projektila
-- **Kolizije:** Detekcija sudara sa platformama i neprijateljima
-
-### 🏗️ Platforme
-- **Normalne platforme:** Osnovne platforme za skakanje
-- **Pokretne platforme:** Platforme koje se kreću levo-desno
-- **Polomljive platforme:** Nestaju posle skoka
-- **Dinamička težina:** Platforme se smanjuju sa povećanjem skora
-
-### ⚡ Power-up sistemi
-- **Jetpack:** 2 sekunde letenja sa česticama + imunost na neprijatelje
+### ⚡ Power-up sistem
+- **Jetpack:** 2 sekunde leta sa imunosti na neprijatelje
 - **Spring:** Duplo jači skok
-- **Shield:** 5 sekundi zaštite od neprijatelja (planeta Y)
+- **Shield:** 5 sekundi zaštite od neprijatelja
 
-### 🐛 Neprijatelji i prepreke
-- **Neprijatelji:** Ladybug neprijatelji na platformama
-- **Progresivna težina:** 1-3% šanse za neprijatelje (0-30,000 poena)
-- **Pucanje:** Možete pucati u neprijatelje za bonus poene
-- **Jetpack imunost:** Trisolaris je imun na neprijatelje dok leti
-
-### 🎨 Vizuelni efekti
-- **Čestice:** Jetpack trail i jump efekti
-- **Zvezdana prašina:** Magični rep Trisolaris-a
-- **Eksplozije:** Vizuelni efekti za uništavanje neprijatelja
-- **5 tema:** Colorful, Monochrome, Pixel Art, Luxury, Wired
-
-### 🎵 Audio sistem
-- **Pozadinska muzika:** Kosmička atmosfera
-- **Zvučni efekti:** Jump, power-up, collision zvukovi
-- **Toggle:** Uključivanje/isključivanje zvuka
+### 🎵 Audio i vizuelni efekti
+- **Pozadinska muzika:** Atmosferska kosmička muzika
+- **Zvučni efekti:** Skok, sakupljanje, power-up, sudar
+- **Čestice:** Eksplozije, jetpack trail, zvezdana prašina
+- **Animacije:** Glatke tranzicije i efekti
 
 ## 🎮 Kontrole
 
-### 📱 Osnovne kontrole
-- **Naginjanje:** Levo/desno za kretanje
+- **Naginjanje:** Pomeranje levo/desno
 - **Tap:** Pucanje projektila
-- **Pause:** Pause dugme za pauziranje
-
-### 🎯 Power-up kontrole
-- **Jetpack:** Automatska kontrola dok je aktivan + imunost
-- **Shield:** Automatska zaštita od neprijatelja (planeta Y)
-- **Spring:** Automatski jači skok
+- **Automatsko skakanje:** Pri skoku na platforme
+- **Pause:** Pritisnite pauzu za meni
 
 ## 🏆 Sistem bodovanja
 
-### 📊 Poeni
-- **Skakanje:** 1 poen na 10 piksela visine
-- **Collectibles:** 25 poena po zvezdici
-- **Neprijatelji:** 50 poena po uništenom neprijatelju
-- **Jetpack bonus:** 50 poena za uništavanje neprijatelja dok leti
+- **Visina:** 1 poen na 10 piksela visine
+- **Zvezdice:** +25 poena po sakupljenoj zvezdici
+- **Neprijatelji:** +50 poena po uništenom neprijatelju
+- **Najbolji skor:** Automatsko čuvanje
 
-### 🏅 Najbolji skor
-- **Local storage:** Automatsko čuvanje najboljeg skora
-- **Persistent:** Skor se čuva između sesija
+## 🎨 Kompletno sistem ikonica
 
-## 🎨 Teme
+Ikonicu Trisolaris Jump je optimizovana za sve iOS uređaje i kontekste:
 
-### 🌈 Colorful tema
-- **Boje:** Žive kosmičke boje
-- **Gradijenti:** Višebojni pozadinski gradijenti
-- **Čestice:** Oranžne i crvene čestice
+### 📱 iPhone ikonice
+- **20x20, 29x29, 40x40, 60x60, 76x76** - App Icon (2x, 3x)
+- **1024x1024** - App Store
 
-### ⚪ Monochrome tema
-- **Boje:** Srebrne i bele nijanse
-- **Gradijenti:** Crno-beli pozadinski gradijenti
-- **Rep:** Srebrna zvezdana prašina
+### 📱 iPad ikonice
+- **20x20, 29x29, 40x40, 76x76** - App Icon (1x, 2x)
+- **1024x1024** - App Store
 
-### 🎮 Pixel Art tema
-- **Boje:** Neon retro boje
-- **Pozadina:** Tamno plava gradijent
-- **Trisolaris:** Crvena, plava, žuta (retro boje)
-- **Platforme:** Zelena, ljubičasta, cijan
-- **Neprijatelji:** Svetlo crvena
+### 🔍 Spotlight ikonice
+- **40x40, 58x58, 80x80, 120x120** - Spotlight search
 
-### 💎 Luxury tema
-- **Boje:** Zlatne i dijamantne nijanse
-- **Pozadina:** Duboko ljubičasti gradijent
-- **Trisolaris:** Zlatna, srebrna, biserna
-- **Platforme:** Zlatna, srebrna, dijamantno plava
-- **Neprijatelji:** Rubin crvena
+### ⚙️ Settings ikonice
+- **29x29, 58x58, 87x87** - Settings app
 
-### ⚡ Wired tema (Cyberpunk)
-- **Boje:** Neon cijan i tehno boje
-- **Pozadina:** Tamno zeleni gradijent sa scanlines
-- **Efekti:** Neon glow, tehno grid, scanlines
-- **Trisolaris:** Neon cijan, magenta, plava
-- **Platforme:** Neon stroke, scanlines efekti
-- **UI:** Glitch efekti, neon glow
+### 🔔 Notification ikonice
+- **20x20, 40x40, 60x60** - Notification center
 
-## 🛠️ Instalacija
+### 🎨 Dizajn ikonice
+- **Trisolaris:** Tri kruga sa simbolima X, ▲, ■
+- **Kosmička pozadina:** Crno-plavi gradijent sa zvezdama
+- **Zvezdana prašina:** Cijan rep iza Trisolaris-a
+- **Platforma:** Zelena platforma na dnu
+- **Kosmički efekti:** Elipse u pozadini
 
-### 📋 Preduslovi
-- iOS 14.0+
-- Xcode 12.0+
-- Swift 5.0+
+### 🛠️ Generisanje ikonica
+Sve ikonice su automatski generisane koristeći:
+- `create_icon.py` - Python generator za glavne ikonice
+- `create_additional_icons.py` - Python generator za dodatne ikonice
+- `copy_icons.sh` - Bash skripta za kopiranje
+- `IconGenerator.swift` - SwiftUI generator
+- `trisolaris_icon.svg` - SVG verzija
 
-### 🔧 Koraci instalacije
-1. Klonirajte repository:
+## 🚀 TestFlight Setup
+
+Trisolaris Jump je spreman za TestFlight testiranje! Svi potrebni fajlovi su automatski generisani:
+
+### 📱 Screenshot-ovi
+- **iPhone 6.7" Display:** 1290 x 2796 (iPhone 14/15 Pro Max)
+- **iPhone 6.5" Display:** 1242 x 2688 (iPhone 11/12/13 Pro Max)
+- **iPhone 5.5" Display:** 1242 x 2208 (iPhone 8 Plus)
+- **iPad Pro 12.9" Display:** 2048 x 2732 (iPad Pro 12.9")
+- **iPad Pro 11" Display:** 1668 x 2388 (iPad Pro 11")
+
+### 📋 App Store Connect fajlovi
+- `app_description.txt` - App Store opis
+- `keywords.txt` - Ključne reči za pretragu
+- `test_information.txt` - TestFlight test informacije
+- `email_template.txt` - Email template za testirače
+- `checklist.txt` - Checklist pre objavljivanja
+
+### 🛠️ Automatski setup
 ```bash
-git clone https://github.com/sgazz/Trisolaris-jump.git
+# Pokrenite automatski setup
+./setup_testflight.sh
+
+# Ili ručno generisanje
+python3 create_icon.py
+python3 create_additional_icons.py
+python3 generate_screenshots.py
+./copy_icons.sh
 ```
 
-2. Otvorite projekat u Xcode:
-```bash
-cd Trisolaris-jump
-open "Jump Doodle Jump.xcodeproj"
-```
+### 📖 Detaljna uputstva
+- `TESTFLIGHT_SETUP.md` - Kompletna dokumentacija
+- `testflight_assets/README.md` - Uputstva za TestFlight
 
-3. Izaberite target device ili simulator
+## 🛠️ Tehnologije
 
-4. Pritisnite `Cmd + R` za pokretanje
+- **SwiftUI:** Moderna iOS UI framework
+- **Core Motion:** Senzori za naginjanje
+- **AVFoundation:** Audio reprodukcija
+- **SpriteKit:** Čestice i animacije
+- **UserDefaults:** Čuvanje skorova i podešavanja
 
-## 🎯 Tehnologije
+## 📱 Kompatibilnost
 
-### 📱 Platforma
-- **iOS:** Native iOS aplikacija
-- **SwiftUI:** Modern UI framework
-- **Core Motion:** Senzori za kretanje
+- **iOS:** 15.0+
+- **Uređaji:** iPhone, iPad (sve generacije)
+- **Orijentacija:** Portrait
+- **Senzori:** Accelerometer (naginjanje)
 
-### 🎮 Game Engine
-- **Custom Engine:** Proprijetarni game engine
-- **Timer-based:** 60 FPS game loop
-- **Physics:** Custom fizika za skakanje
+## 🎯 Saveti za igru
 
-### 🎵 Audio
-- **AVFoundation:** Audio playback
-- **Background Music:** Loop pozadinska muzika
-- **Sound Effects:** Multiple audio players
+1. **Koristite jetpack pametno:** Sačuvajte ga za opasne situacije
+2. **Sakupljajte zvezdice:** Daju bonus poene
+3. **Pucajte na neprijatelje:** Uništavajte ih pre nego što vas dotaknu
+4. **Pratite platforme:** Različite tipove platformi
+5. **Koristite štit:** Aktivirajte ga kada vidite neprijatelje
 
-### 🎨 Theme System
-- **ThemeManager:** Centralizovano upravljanje temama
-- **5 tema:** Colorful, Monochrome, Pixel Art, Luxury, Wired
-- **Real-time switching:** Trenutna promena tema
-- **Persistent:** Čuvanje izabrane teme
+## 🚀 Razvoj
 
-## 🚀 Performanse
-
-### ⚡ Optimizacije
-- **Čestice:** Ograničen broj čestica (50 max)
-- **Zvezdana prašina:** Ograničen broj (30 max)
-- **Frame rate:** 60 FPS optimizacija
-- **Memory management:** Automatsko čišćenje
-- **Wired efekti:** Optimizovani cyberpunk efekti
-
-### 📊 Statistike
-- **Platforme:** Dinamičko generisanje
-- **Neprijatelji:** 1-3% frekvencija
-- **Power-ups:** 15% šansa po platformi
-- **Jetpack:** 2 sekunde trajanja + imunost
-
-## 🎮 Gameplay tips
-
-### 💡 Strategije
-1. **Koristite jetpack:** Za letenje i imunost na neprijatelje
-2. **Sakupljajte zvezdice:** Bonus poeni za visok skor
-3. **Pucajte u neprijatelje:** 50 bonus poena
-4. **Izbegavajte polomljive platforme:** Mogu vas pokolebati
-5. **Kombinujte power-up-ove:** Jetpack + shield za maksimalnu sigurnost
-
-### 🏆 Za visok skor
-- Fokusirajte se na sakupljanje collectibles
-- Koristite jetpack za sigurno uništavanje neprijatelja
-- Pratite pokretne platforme
-- Sačuvajte shield za kritične situacije
-- Eksperimentišite sa različitim temama
-
-### ⚡ Jetpack strategija
-- **Imunost:** Slobodno letite preko neprijatelja
-- **Bonus poeni:** Uništavajte neprijatelje dok letite
-- **Kombinacija:** Jetpack + pucanje za maksimalne poene
-- **Trajanje:** 2 sekunde za strateško planiranje
-
-## 🔧 Razvoj
-
-### 📁 Struktura projekta
+### Struktura projekta
 ```
 Jump Doodle Jump/
 ├── ContentView.swift          # Glavna igra
-├── Jump_Doodle_JumpApp.swift  # App entry point
-├── Themes/
-│   └── ThemeManager.swift     # Upravljanje temama
+├── ThemeManager.swift         # Upravljanje temama
 ├── Assets.xcassets/          # Resursi
+│   └── AppIcon.appiconset/   # Kompletno sistem ikonica
+│       ├── AppIcon.png       # Glavna ikonica
+│       ├── iPhone_*.png      # iPhone ikonice
+│       ├── iPad_*.png        # iPad ikonice
+│       ├── Spotlight_*.png   # Spotlight ikonice
+│       ├── Settings_*.png    # Settings ikonice
+│       └── Notification_*.png # Notification ikonice
+├── create_icon.py            # Generator glavnih ikonica
+├── create_additional_icons.py # Generator dodatnih ikonica
+├── generate_screenshots.py   # Generator screenshot-a
+├── copy_icons.sh             # Skripta za kopiranje
+├── setup_testflight.sh       # Automatski TestFlight setup
+├── IconGenerator.swift       # SwiftUI generator
+├── trisolaris_icon.svg       # SVG ikonica
+├── screenshots/              # Screenshot-ovi za TestFlight
+├── testflight_assets/        # App Store Connect fajlovi
 └── README.md                 # Dokumentacija
 ```
 
-### 🎯 Glavne komponente
-- **ContentView:** Glavna game view
-- **ThemeManager:** Centralizovano upravljanje temama
-- **Theme system:** 5 jedinstvenih tema
-- **Particle system:** Čestice i efekti
-- **Audio system:** Zvukovi i muzika
-- **Physics engine:** Fizika skakanja
+### Dodavanje novih tema
+1. Dodajte novu temu u `ThemeManager.swift`
+2. Definišite boje i efekte
+3. Testirajte na različitim uređajima
 
-### 🌌 Wired tema detalji
-- **Cyberpunk estetika:** Neon boje i tehno efekti
-- **Scanlines:** Horizontalne linije preko ekrana
-- **Tehno grid:** Digitalna mreža u pozadini
-- **Neon glow:** Svetleći efekti na svim elementima
-- **Glitch efekti:** Blur i offset za UI elemente
+### Optimizacija performansi
+- Ograničen broj čestica (50 max)
+- Optimizovana zvezdana prašina (30 max)
+- Efikasno ažuriranje čestica
 
-## 🤝 Doprinosi
+### Generisanje ikonica
+```bash
+# Kompletno generisanje svih ikonica
+python3 -m venv icon_env
+source icon_env/bin/activate
+pip install Pillow
+python create_icon.py
+python create_additional_icons.py
+./copy_icons.sh
+```
 
-Dobrodošli su svi doprinosi! Molimo vas da:
+### TestFlight setup
+```bash
+# Automatski setup za TestFlight
+./setup_testflight.sh
 
-1. Fork-ujte projekat
-2. Kreirajte feature granu (`git checkout -b feature/AmazingFeature`)
-3. Commit-ujte promene (`git commit -m 'Add AmazingFeature'`)
-4. Push-ujte granu (`git push origin feature/AmazingFeature`)
-5. Otvorite Pull Request
+# Ručno generisanje screenshot-a
+python3 generate_screenshots.py
+```
 
 ## 📄 Licenca
 
-Ovaj projekat je pod [MIT License](LICENSE) licencom.
+Ovaj projekat je kreiran za edukaciju i zabavu. Slobodno koristite i modifikujte prema potrebi.
 
-## 👨‍💻 Autor
+## 🤝 Doprinosi
 
-**Gazza** - [GitHub](https://github.com/sgazz)
-
-## 🙏 Zahvalnice
-
-- Inspirisano "The Three-Body Problem" serijom
-- Kosmičke teme i koncepti
-- SwiftUI i iOS development community
-- Cyberpunk i retro gaming estetika
+Dobrodošli su svi predlozi za poboljšanja:
+- Nove teme
+- Dodatni power-up-ovi
+- Nove mehanike
+- Optimizacije performansi
+- Poboljšanja ikonica
+- TestFlight feedback
 
 ---
 
-⭐ **Ako vam se sviđa projekat, ostavite zvezdicu!** ⭐ 
+**Napomena:** Igra je inspirisana "The Three-Body Problem" trilogijom Liu Cixina, ali nije povezana sa zvaničnim proizvodima. 

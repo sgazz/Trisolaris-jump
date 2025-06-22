@@ -1,0 +1,25 @@
+What to Test:
+- Osnovna mehanika skakanja
+- Kontrola naginjanjem telefona
+- Power-up sistemi (Jetpack, Spring, Shield)
+- Različite teme (Monochrome, Pixel Art, Luxury, Wired)
+- Audio efekti i pozadinska muzika
+- Sistem bodovanja i najbolji skor
+- Čestice i vizuelni efekti
+- Kolizije sa neprijateljima
+- Sakupljanje zvezdica
+- Pause/Resume funkcionalnost
+- Game Over i restart
+- Toggle zvuka
+- Promena tema
+
+Known Issues:
+- Nema poznatih problema
+
+Notes:
+- Igra zahteva accelerometer za kontrolu
+- Preporučeno igranje u portrait modu
+- Testirajte na različitim iPhone/iPad modelima
+- Power-up-ovi se aktiviraju skakanjem na platforme
+- Jetpack daje imunost na neprijatelje
+- Štit štiti od jednog sudara sa neprijateljem

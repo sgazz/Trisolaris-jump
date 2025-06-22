@@ -1,0 +1,35 @@
+TestFlight Setup Checklist:
+==========================
+
+Pre objavljivanja:
+□ Apple Developer Program članstvo ($99/godišnje)
+□ Xcode 15.0+ instaliran
+□ App Store Connect pristup
+
+Xcode konfiguracija:
+□ Bundle identifier promenjen u jedinstveni
+□ Team izabran u Signing & Capabilities
+□ Automatically manage signing uključen
+□ Deployment target postavljen na iOS 15.0
+□ App icon dodata (1024x1024)
+
+App Store Connect:
+□ Nova aplikacija kreirana
+□ App information popunjeno
+□ Screenshots upload-ovani
+□ App description dodata
+□ Keywords dodati
+
+TestFlight:
+□ Build uspešno upload-ovan
+□ Internal testing aktivan
+□ Testers dodati
+□ Test information napisana
+□ External testing submit-ovan za review
+
+Nakon TestFlight-a:
+□ Feedback od testirača
+□ Bug fixes implementirani
+□ Poboljšanja dodana
+□ Final build upload-ovan
+□ App Store submission

@@ -1,0 +1,31 @@
+Trisolaris Jump je akciona platformer igra gde kontrolišete Trisolaris - kosmičko biće sa tri tela koje skače kroz svemir, izbegava neprijatelje i sakuplja zvezdice.
+
+🌟 Karakteristike:
+• Četiri jedinstvene teme (Monochrome, Pixel Art, Luxury, Wired)
+• Power-up sistemi (Jetpack, Spring, Shield)
+• Kosmički vizuelni efekti i čestice
+• Atmosferska pozadinska muzika
+• Kontrola naginjanjem telefona
+
+🎮 Kontrole:
+• Naginjanje levo/desno za kretanje
+• Tap za pucanje projektila
+• Automatsko skakanje na platforme
+
+🏆 Sistem bodovanja:
+• Poeni za visinu skakanja
+• Bonus poeni za sakupljanje zvezdica
+• Najbolji skor se čuva automatski
+
+🎨 Teme:
+• Monochrome: Elegantna crno-bela tema
+• Pixel Art: Retro piksel stil
+• Luxury: Premium zlatno-crna tema
+• Wired: Cyberpunk neon tema
+
+⚡ Power-up-ovi:
+• Jetpack: 2 sekunde leta sa imunosti
+• Spring: Duplo jači skok
+• Shield: 5 sekundi zaštite
+
+Igrajte Trisolaris Jump i istražite kosmičke tajne!
